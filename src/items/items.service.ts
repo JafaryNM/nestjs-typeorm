@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { EntityManager, Repository } from 'typeorm';
@@ -10,11 +10,12 @@ export class ItemsService {
   constructor(
     @InjectRepository(Item)
     private readonly itemsRepository: Repository<Item>,
-    private readonly entityMager: EntityManager,
+    private readonly entityManager: EntityManager,
   ) {}
+
   async create(createItemDto: CreateItemDto) {
     const item = new Item(createItemDto);
-    await this.entityMager.save(item);
+    return this.entityManager.save(item);
   }
 
   async findAll() {
@@ -25,9 +26,14 @@ export class ItemsService {
     return this.itemsRepository.findOneBy({ id });
   }
 
-  // update(id: number, updateItemDto: UpdateItemDto) {
-  //   return `This action updates a #${id} item`;
-  // }
+  async update(id: number, updateItemDto: UpdateItemDto) {
+    const item = await this.itemsRepository.findOneBy({ id });
+    if (!item) {
+      throw new NotFoundException(`Item with id ${id} not found`);
+    }
+    Object.assign(item, updateItemDto);
+    return this.entityManager.save(item);
+  }
 
   // remove(id: number) {
   //   return `This action removes a #${id} item`;
