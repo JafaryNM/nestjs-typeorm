@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ItemsModule } from './items/items.module';
 
 @Module({
   imports: [
@@ -17,9 +18,10 @@ import { AppService } from './app.service';
         password: configService.getOrThrow<string>('DB_PASSWORD'),
         database: configService.getOrThrow<string>('DB_DATABASE'),
         autoLoadEntities: true,
-        synchronize: true, // development only
+        synchronize: true, // 
       }),
     }),
+    ItemsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
